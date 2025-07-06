@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -8,29 +9,22 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"videoservice/Interfaces"
 )
 
 type VideoController struct {
+	FileSystemService interfaces.IFileSystemService
 }
 
-func (VideoController) GetVideos(w http.ResponseWriter, r *http.Request) {
+func (vc VideoController) GetVideos(w http.ResponseWriter, r *http.Request) {
 
 	video := strings.Split(r.URL.Path, "/")[2]
 
-	requestedBytes := r.Header.Get("Range")
-
-	bytesRange := strings.Split(requestedBytes, "=")[1]
-	bytesStartAndEnd := strings.Split(bytesRange, "-")
-
-	intStart, err := strconv.Atoi(bytesStartAndEnd[0])
-
-	if err != nil {
-		fmt.Fprint(w, "Failed to read range header")
-	}
+	intStart, err := getRequestedRange(r.Header)
 
 	amountOfBytes := math.Pow(10, 6)
 
-	file, err := GetFile(video)
+	file, err := vc.FileSystemService.GetFile(video)
 
 	if err == os.ErrNotExist {
 		fmt.Fprintf(w, "404 Could not find file: %s.mp4\n", video)
@@ -59,25 +53,17 @@ func (VideoController) GetVideos(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func GetFile(fileName string) (*os.File, error) {
-	files, err := os.ReadDir("../Videos")
+func getRequestedRange(header http.Header) (int, error) {
+	requestedBytes := header.Get("Range")
+
+	bytesRange := strings.Split(requestedBytes, "=")[1]
+	bytesStartAndEnd := strings.Split(bytesRange, "-")
+
+	start, err := strconv.Atoi(bytesStartAndEnd[0])
 
 	if err != nil {
-		return nil, err
+		return -1, err
 	}
 
-	for _, file := range files {
-		if file.Name() == fileName+".mp4" {
-			pFile, err := os.Open("../Videos/" + file.Name())
-
-			if err != nil {
-				return nil, err
-			}
-
-			return pFile, nil
-		}
-
-	}
-
-	return nil, os.ErrNotExist
+	return start, nil
 }

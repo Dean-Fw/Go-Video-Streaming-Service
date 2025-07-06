@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"videoservice/Controllers"
+	"videoservice/Services"
 )
 
 func homePageHandler(w http.ResponseWriter, r *http.Request) {
@@ -17,7 +18,10 @@ func homePageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	videoService := controllers.VideoController{}
+
+	videoService := controllers.VideoController{
+		FileSystemService: services.FileSystemService{},
+	}
 
 	http.HandleFunc("GET /video/{name}", videoService.GetVideos)
 
