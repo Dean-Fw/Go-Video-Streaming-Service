@@ -1,7 +1,6 @@
-package controllers
+package handlers
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"math"
@@ -12,11 +11,11 @@ import (
 	"videoservice/Interfaces"
 )
 
-type VideoController struct {
+type GetVideosHandler struct {
 	FileSystemService interfaces.IFileSystemService
 }
 
-func (vc VideoController) GetVideos(w http.ResponseWriter, r *http.Request) {
+func (vh GetVideosHandler) Handle(w http.ResponseWriter, r *http.Request) {
 
 	video := strings.Split(r.URL.Path, "/")[2]
 
@@ -24,7 +23,7 @@ func (vc VideoController) GetVideos(w http.ResponseWriter, r *http.Request) {
 
 	amountOfBytes := math.Pow(10, 6)
 
-	file, err := vc.FileSystemService.GetFile(video)
+	file, err := vh.FileSystemService.GetFile(video)
 
 	if err == os.ErrNotExist {
 		fmt.Fprintf(w, "404 Could not find file: %s.mp4\n", video)
