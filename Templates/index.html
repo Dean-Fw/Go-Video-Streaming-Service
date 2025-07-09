@@ -5,8 +5,29 @@
 
 <body>
 	<video controls="">
-		<source src="/video/demo" type="video/mp4" />
+		<source src="/videos/demo" type="video/mp4" />
 	</video>
+
+	<button id="upload">PRESS ME!</button>
+
+	<script>
+		const button = document.getElementById("upload");
+
+
+		button.addEventListener('click', async _ => {
+			const file = await fetch("file://home/dfw/Projects/video_streamer/Videos/demo.mp4");
+
+			console.log(file);
+			await fetch('http://localhost:5050/videos', {
+				method: 'POST',
+				headers: {
+					"Upload-Length": "0",
+					"Content-Length": "0",
+					"File-Name": "Hello",
+				},
+			})
+		});
+	</script>
 </body>
 
 </html>

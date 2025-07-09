@@ -2,6 +2,6 @@ package interfaces
 
 import "net/http"
 
-type IHandler interface {
+type Handler interface {
 	Handle(w http.ResponseWriter, r *http.Request)
 }
