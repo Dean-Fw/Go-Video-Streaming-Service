@@ -8,7 +8,8 @@ import (
 type FileSystemService struct{}
 
 func (FileSystemService) CreateNewFile(FileNameHash string, content []byte) error {
-	err := os.WriteFile(fmt.Sprintf("./Videos/%s.mp4", FileNameHash), content, 0644)
+	fmt.Printf("%s", FileNameHash)
+	err := os.WriteFile(fmt.Sprintf("../Videos/%s.mp4", FileNameHash), content, 0644)
 
 	if err != nil {
 		return err

@@ -1,6 +1,9 @@
 package services
 
-import "crypto/sha256"
+import (
+	"crypto/sha256"
+	"fmt"
+)
 
 type HashingService struct{}
 
@@ -11,5 +14,5 @@ func (HashingService) Hash(input string) string {
 
 	hashByteSlice := hash.Sum(nil)
 
-	return string(hashByteSlice)
+	return fmt.Sprintf("%x", hashByteSlice)
 }

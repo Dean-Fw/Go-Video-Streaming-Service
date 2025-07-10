@@ -1,6 +1,11 @@
 <html>
 
 <head>
+	<script>
+		const getFile = async () => {
+			const [fileHandle] = await window.showOpenFilePicker();
+		}
+	</script>
 </head>
 
 <body>
@@ -8,23 +13,43 @@
 		<source src="/videos/demo" type="video/mp4" />
 	</video>
 
+	<input id="file-selection" type="file" accept="video/mp4" />
 	<button id="upload">PRESS ME!</button>
 
+
+
 	<script>
+		const input = document.getElementById("file-selection")
+		const reader = new FileReader();
+		const fileByteArray = [];
+
+		input.addEventListener('change', (e) => {
+			reader.readAsArrayBuffer(e.target.files[0]);
+			reader.onloadend = (evt) => {
+				if (evt.target.readyState === FileReader.DONE) {
+					const arrayBuffer = 1000000,
+						array = new Uint8Array(arrayBuffer);
+					for (const a of array) {
+						fileByteArray.push(a);
+					}
+					console.log(fileByteArray)
+				}
+			}
+		})
+
+
 		const button = document.getElementById("upload");
 
-
 		button.addEventListener('click', async _ => {
-			const file = await fetch("file://home/dfw/Projects/video_streamer/Videos/demo.mp4");
-
-			console.log(file);
 			await fetch('http://localhost:5050/videos', {
 				method: 'POST',
 				headers: {
-					"Upload-Length": "0",
-					"Content-Length": "0",
+					"Upload-Length": `${fileByteArray.length}`,
+					"Content-Length": "10",
 					"File-Name": "Hello",
+					"Content-Type": "video/mp4"
 				},
+				body: fileByteArray.join("")
 			})
 		});
 	</script>

@@ -15,6 +15,8 @@ type PostStartUploadHandler struct {
 }
 
 func (handler PostStartUploadHandler) Handle(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Access-Control-Allow-Origin", "*")
+
 	requiredHeaders, err := GetHeaders(r.Header)
 
 	if err != nil {
