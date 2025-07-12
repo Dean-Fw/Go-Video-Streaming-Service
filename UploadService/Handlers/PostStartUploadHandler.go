@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 	"uploadservice/Errors"
@@ -26,11 +25,13 @@ func (handler PostStartUploadHandler) Handle(w http.ResponseWriter, r *http.Requ
 
 	content := make([]byte, requiredHeaders.ContentLength)
 
-	_, err = r.Body.Read(content)
+	if requiredHeaders.ContentLength > 0 {
+		_, err = r.Body.Read(content)
 
-	if err != nil {
-		http.Error(w, "Failed to read content of request", 500)
-		return
+		if err != nil {
+			http.Error(w, "Failed to read content of request", 500)
+			return
+		}
 	}
 
 	hashedName := handler.HashingService.Hash(requiredHeaders.FileName)
@@ -42,10 +43,7 @@ func (handler PostStartUploadHandler) Handle(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	log.Print("INFO: WRITTEN FILE")
-
 	AddResponseHeaders(w, hashedName, len(content))
-
 }
 
 func GetHeaders(headers http.Header) (models.PostUploadStartHeaders, error) { // TODO Refactor this to be DRY
