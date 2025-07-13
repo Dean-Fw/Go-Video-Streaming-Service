@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"uploadservice/Handlers"
 	"uploadservice/Services"
+	transport "uploadservice/Transport"
 )
 
 func AddRoutes() *http.ServeMux {
@@ -29,7 +30,10 @@ func addPostVideos(router *http.ServeMux) {
 }
 
 func addPatchVideos(router *http.ServeMux) {
-	patchVideosHandler := handlers.PatchVideosHandler{}
+	patchVideosTranspot := transport.PatchVideosTransport{
+		HeaderValidatorService: services.HeaderValidatorService{},
+		PatchVideosHandler:     handlers.PatchVideosHandler{},
+	}
 
-	router.HandleFunc("PATCH /videos/{id}", patchVideosHandler.Handle)
+	router.HandleFunc("PATCH /videos/{id}", patchVideosTranspot.Receive)
 }

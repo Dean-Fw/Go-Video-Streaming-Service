@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"uploadservice/Errors"
-	"uploadservice/Interfaces"
+	"uploadservice/Interfaces/Services"
 	"uploadservice/Models"
 )
 

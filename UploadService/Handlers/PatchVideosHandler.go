@@ -1,13 +1,11 @@
 package handlers
 
 import (
-	"fmt"
-	"net/http"
+	"uploadservice/Models/PatchVideosModels"
 )
 
 type PatchVideosHandler struct{}
 
-func (handler PatchVideosHandler) Handle(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Hello")
-
+func (PatchVideosHandler) Handle(request models.PatchVideosRequest) (string, error) {
+	return "Hello", nil
 }
