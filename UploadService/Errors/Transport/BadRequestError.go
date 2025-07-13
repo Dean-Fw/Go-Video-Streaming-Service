@@ -1,4 +1,4 @@
-package errors
+package transportErrors
 
 type BadRequestError struct {
 	Message string

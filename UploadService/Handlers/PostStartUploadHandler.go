@@ -3,13 +3,14 @@ package handlers
 import (
 	"net/http"
 	"strconv"
-	"uploadservice/Errors"
+	"uploadservice/Errors/Transport"
 	"uploadservice/Interfaces/Services"
+	"uploadservice/Interfaces/Services/FileSystemService"
 	"uploadservice/Models"
 )
 
 type PostStartUploadHandler struct {
-	FileSystemService interfaces.IFileSystemService
+	FileSystemService filesystemInterfaces.IFileSystemService
 	HashingService    interfaces.IHashingService
 }
 
@@ -50,31 +51,31 @@ func GetHeaders(headers http.Header) (models.PostUploadStartHeaders, error) { //
 	uploadLengthHeader := headers.Get("Upload-Length")
 
 	if uploadLengthHeader == "" {
-		return models.PostUploadStartHeaders{}, errors.BadRequestError{Message: "Missing Upload-Length Header"}
+		return models.PostUploadStartHeaders{}, transportErrors.BadRequestError{Message: "Missing Upload-Length Header"}
 	}
 
 	uploadLength, err := strconv.Atoi(uploadLengthHeader)
 
 	if err != nil {
-		return models.PostUploadStartHeaders{}, errors.BadRequestError{Message: "Could not parse Upload-Length as an int"}
+		return models.PostUploadStartHeaders{}, transportErrors.BadRequestError{Message: "Could not parse Upload-Length as an int"}
 	}
 
 	contentLengthHeader := headers.Get("Content-Length")
 
 	if contentLengthHeader == "" {
-		return models.PostUploadStartHeaders{}, errors.BadRequestError{Message: "Missing Content-Length Header"}
+		return models.PostUploadStartHeaders{}, transportErrors.BadRequestError{Message: "Missing Content-Length Header"}
 	}
 
 	contentLength, err := strconv.Atoi(contentLengthHeader)
 
 	if err != nil {
-		return models.PostUploadStartHeaders{}, errors.BadRequestError{Message: "Could not parse Content-Length as an int"}
+		return models.PostUploadStartHeaders{}, transportErrors.BadRequestError{Message: "Could not parse Content-Length as an int"}
 	}
 
 	fileName := headers.Get("File-Name")
 
 	if fileName == "" {
-		return models.PostUploadStartHeaders{}, errors.BadRequestError{Message: "Missing File-Name Header"}
+		return models.PostUploadStartHeaders{}, transportErrors.BadRequestError{Message: "Missing File-Name Header"}
 	}
 
 	return models.PostUploadStartHeaders{
