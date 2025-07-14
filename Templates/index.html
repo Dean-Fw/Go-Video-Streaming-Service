@@ -45,11 +45,10 @@
 				method: 'POST',
 				headers: {
 					"Upload-Length": `${fileByteArray.length}`,
-					"Content-Length": "10",
+					"Content-Length": "0",
 					"File-Name": "Hello",
 					"Content-Type": "video/mp4"
 				},
-				body: fileByteArray.join("")
 			})
 		});
 	</script>

@@ -31,3 +31,20 @@ func (service HeaderValidatorService) CheckHeaderIntValue(headerKey string, head
 
 	return intValue, nil
 }
+
+func (service HeaderValidatorService) CheckHeaderInt64Value(headerKey string, headerValue string) (int64, error) {
+
+	stringValue, err := service.CheckHeaderStringValue(headerKey, headerValue)
+
+	if err != nil {
+		return -1, err
+	}
+
+	intValue, err := strconv.ParseInt(stringValue, 10, 64)
+
+	if err != nil {
+		return -1, errors.HeaderIsNotIntError{HeaderName: headerKey}
+	}
+
+	return intValue, nil
+}

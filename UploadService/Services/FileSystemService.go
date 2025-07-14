@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"uploadservice/Errors/Services/FileSystemService"
+	"uploadservice/Models/Services/FileSystemService"
 )
 
 type FileSystemService struct{}
@@ -19,20 +20,32 @@ func (FileSystemService) CreateNewFile(FileNameHash string, content []byte) erro
 	return nil
 }
 
-func (FileSystemService) GetFile(fileNameHash string) (io.WriteCloser, error) {
+func (FileSystemService) GetFile(fileNameHash string) (filesystemModels.GetFilesResponseModel, error) {
 	directory := "../Videos"
 
 	file, err := os.OpenFile(fmt.Sprintf("%s/%s.mp4", directory, fileNameHash), os.O_APPEND|os.O_WRONLY, os.ModeAppend)
 
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, filesystemServiceErrors.FileNotFoundError{File: fmt.Sprintf("%s.mp4", fileNameHash)}
+			return filesystemModels.GetFilesResponseModel{},
+				filesystemServiceErrors.FileNotFoundError{File: fmt.Sprintf("%s.mp4", fileNameHash)}
 		} else {
-			return nil, err
+			return filesystemModels.GetFilesResponseModel{},
+				err
 		}
 	}
 
-	return file, nil
+	fileInfo, err := file.Stat()
+
+	if err != nil {
+		return filesystemModels.GetFilesResponseModel{},
+			err
+	}
+
+	return filesystemModels.GetFilesResponseModel{
+		FileWriter: file,
+		FileSize:   fileInfo.Size(),
+	}, nil
 }
 
 func (FileSystemService) UpdateFile(file io.WriteCloser, content []byte) error {

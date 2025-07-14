@@ -13,7 +13,7 @@ type PatchVideosHandler struct {
 }
 
 func (handler PatchVideosHandler) Handle(request models.PatchVideosRequest) error {
-	file, err := handler.FileSystemService.GetFile(request.Resource)
+	resp, err := handler.FileSystemService.GetFile(request.Resource)
 
 	if err != nil {
 		if errors.As(err, &filesystemServiceErrors.FileNotFoundError{}) {
@@ -23,13 +23,17 @@ func (handler PatchVideosHandler) Handle(request models.PatchVideosRequest) erro
 		}
 	}
 
-	defer file.Close()
+	defer resp.FileWriter.Close()
 	defer request.Content.Close()
+
+	if request.Headers.UploadOffset < resp.FileSize || request.Headers.UploadOffset > resp.FileSize {
+		return patchVideosHandlerErrors.UploadOffsetConflictError{ResourceOffset: resp.FileSize, RequestOffset: request.Headers.UploadOffset}
+	}
 
 	contentBytes := make([]byte, request.Headers.ContentLength)
 	request.Content.Read(contentBytes)
 
-	err = handler.FileSystemService.UpdateFile(file, contentBytes)
+	err = handler.FileSystemService.UpdateFile(resp.FileWriter, contentBytes)
 
 	return nil
 }

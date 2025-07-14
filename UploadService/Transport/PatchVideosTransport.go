@@ -1,7 +1,6 @@
 package transport
 
 import (
-	"errors"
 	"log"
 	"net/http"
 	"uploadservice/Errors/Handlers/PatchVideosHandler"
@@ -27,15 +26,16 @@ func (transport PatchVideosTransport) Receive(w http.ResponseWriter, r *http.Req
 	err = transport.PatchVideosHandler.Handle(models.PatchVideosRequest{Resource: r.PathValue("id"), Headers: headers, Content: r.Body})
 
 	if err != nil {
-		if errors.As(err, &patchVideosHandlerErrors.ResourceNotFoundError{}) {
+		switch err.(type) {
+		case patchVideosHandlerErrors.ResourceNotFoundError:
 			http.Error(w, err.Error(), http.StatusNotFound)
-			return
-		} else {
-			log.Printf("[ERROR]: %s", err.Error())
+		case patchVideosHandlerErrors.UploadOffsetConflictError:
+			http.Error(w, err.Error(), http.StatusConflict)
+		default:
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			log.Printf("[ERROR] : %s\n", err.Error())
 		}
-
 	}
-
 }
 
 func (transport PatchVideosTransport) checkHeaders(headers http.Header) (models.PatchVideosHeaders, error) {
@@ -51,7 +51,7 @@ func (transport PatchVideosTransport) checkHeaders(headers http.Header) (models.
 		return models.PatchVideosHeaders{}, transportErrors.BadRequestError{Message: err.Error()}
 	}
 
-	uploadOffset, err := transport.HeaderValidatorService.CheckHeaderIntValue("Upload-Offset", headers.Get("Upload-Offset"))
+	uploadOffset, err := transport.HeaderValidatorService.CheckHeaderInt64Value("Upload-Offset", headers.Get("Upload-Offset"))
 
 	if err != nil {
 		return models.PatchVideosHeaders{}, transportErrors.BadRequestError{Message: err.Error()}
