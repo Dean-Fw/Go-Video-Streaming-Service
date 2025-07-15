@@ -1,0 +1,8 @@
+.fileSelection {
+	margin: 10px;
+	padding: 10px;
+	border: black 2px solid;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+}
